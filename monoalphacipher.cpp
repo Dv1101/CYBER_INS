@@ -6,10 +6,15 @@ using namespace std;
 string encrypt(string plaintext, const map<char, char>& cipherMap) {
     string ciphertext;
     for (char c : plaintext) {
-        if (cipherMap.count(c) > 0) {
-            ciphertext += cipherMap.at(c);
+        if (isalpha(c)) {
+            char uppercase_c = toupper(c);
+            if (cipherMap.count(uppercase_c) > 0) {
+                ciphertext += cipherMap.at(uppercase_c);
+            } else {
+                ciphertext += c; // For non-alphabetic characters, just append them as they are.
+            }
         } else {
-            ciphertext += c;
+            ciphertext += c; // For non-alphabetic characters, just append them as they are.
         }
     }
     return ciphertext;
@@ -18,16 +23,21 @@ string encrypt(string plaintext, const map<char, char>& cipherMap) {
 string decrypt(string ciphertext, const map<char, char>& cipherMap) {
     string plaintext;
     for (char c : ciphertext) {
-        bool found = false;
-        for (const auto& pair : cipherMap) {
-            if (pair.second == c) {
-                plaintext += pair.first;
-                found = true;
-                break;
+        if (isalpha(c)) {
+            char uppercase_c = toupper(c);
+            bool found = false;
+            for (const auto& pair : cipherMap) {
+                if (pair.second == uppercase_c) {
+                    plaintext += pair.first;
+                    found = true;
+                    break;
+                }
             }
-        }
-        if (!found) {
-            plaintext += c;
+            if (!found) {
+                plaintext += c; // If the character is not found in the cipher map, just append it as it is.
+            }
+        } else {
+            plaintext += c; // For non-alphabetic characters, just append them as they are.
         }
     }
     return plaintext;
@@ -35,7 +45,7 @@ string decrypt(string ciphertext, const map<char, char>& cipherMap) {
 
 int main() {
     map<char, char> cipherMap;
-    
+
     cipherMap['A'] = 'Z';
     cipherMap['B'] = 'Y';
     cipherMap['C'] = 'X';
@@ -49,7 +59,6 @@ int main() {
     cipherMap['K'] = 'P';
     cipherMap['L'] = 'O';
     cipherMap['M'] = 'N';
-
     cipherMap['N'] = 'M';
     cipherMap['O'] = 'L';
     cipherMap['P'] = 'K';
@@ -63,14 +72,14 @@ int main() {
     cipherMap['X'] = 'C';
     cipherMap['Y'] = 'B';
     cipherMap['Z'] = 'A';
-    
+
     string plaintext;
     cout << "Enter the plaintext: ";
     getline(cin, plaintext);
-    
+
     string ciphertext = encrypt(plaintext, cipherMap);
     cout << "Ciphertext: " << ciphertext << endl;
-    
+
     cout << "Enter the Ciphertext: ";
     getline(cin, ciphertext);
     string decryptedText = decrypt(ciphertext, cipherMap);

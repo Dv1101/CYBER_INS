@@ -1,5 +1,4 @@
 #include<iostream>
-#include<climits>
 #include<string>
 using namespace std;
 
@@ -36,7 +35,68 @@ void encryption(int key_arr[2][2], int txt_arr[2][2])
 
 }
 
+int gcdExtended(int a, int b, int& x, int& y) {
+    if (a == 0) {
+        x = 0;
+        y = 1;
+        return b;
+    }
 
+    int x1, y1;
+    int gcd = gcdExtended(b % a, a, x1, y1);
+
+    x = y1 - (b / a) * x1;
+    y = x1;
+
+    return gcd;
+}
+
+int modInverse(int a, int m) {
+    int x, y;
+    int gcd = gcdExtended(a, m, x, y);
+
+    if (gcd != 1) {
+        cerr << "Inverse does not exist." << endl;
+        exit(1);
+    }
+
+    return (x % m + m) % m;
+}
+
+void decryption(int key_arr[2][2], int txt_arr[2][2]) {
+    int det = key_arr[0][0] * key_arr[1][1] - key_arr[0][1] * key_arr[1][0];
+    int mod_det = (det % 26 + 26) % 26;
+
+    int detInverse = modInverse(mod_det, 26);
+
+    int inv_key_arr[2][2];
+
+    inv_key_arr[0][0] = (key_arr[1][1] * detInverse) % 26;
+    inv_key_arr[0][1] = (-key_arr[0][1] * detInverse + 26) % 26;
+    inv_key_arr[1][0] = (-key_arr[1][0] * detInverse + 26) % 26;
+    inv_key_arr[1][1] = (key_arr[0][0] * detInverse) % 26;
+
+    int plain_arr[2][2];
+
+    plain_arr[0][0] = (inv_key_arr[0][0] * txt_arr[0][0] + inv_key_arr[0][1] * txt_arr[1][0]) % 26;
+    plain_arr[1][0] = (inv_key_arr[0][0] * txt_arr[0][1] + inv_key_arr[0][1] * txt_arr[1][1]) % 26;
+                      //(inv_key_arr[1][0] * txt_arr[0][0] + inv_key_arr[1][1] * txt_arr[1][0])
+
+    plain_arr[0][1] = (inv_key_arr[1][0] * txt_arr[0][0] + inv_key_arr[1][1] * txt_arr[1][0]) % 26;
+    plain_arr[1][1] = (inv_key_arr[1][0] * txt_arr[0][1] + inv_key_arr[1][1] * txt_arr[1][1]) % 26;
+
+    string plainText = "";
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            char c = 'A' + (plain_arr[i][j] + 26) % 26;
+            plainText += c;
+        }
+    }
+
+    cout << endl << "************************************" << endl;
+    cout << "Decrypted text is: " << plainText << endl;
+    cout << "************************************" << endl << endl;
+}
 
 
 int main()
@@ -95,7 +155,33 @@ int main()
     }
 
     encryption(key_arr, txt_arr);
-    
+
+    cout << "Enter ciphertext : " << endl;
+    string txtt;
+    getline(cin, txtt);
+
+    int txt_arrr[2][2];
+    int txtnum_arrr[4];
+
+    for (int i = 0; i < txtt.size(); i++) {
+        char c = txtt[i];
+        int temp = c;
+        int converted = temp - 'A';
+        txtnum_arrr[i] = converted;
+    }
+
+    k = 0;
+    for (int i = 0; i < 2; i++) {
+        txt_arrr[i][0] = txtnum_arrr[k];
+        k++;
+    }
+
+    for (int i = 0; i < 2; i++) {
+        txt_arrr[i][1] = txtnum_arrr[k];
+        k++;
+    }
+
+    decryption(key_arr, txt_arrr);
 
     return 0;
 }

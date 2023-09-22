@@ -1,8 +1,14 @@
 {
     "files.associations": {
         "iostream": "cpp",
-        "map": "cpp",
+        "system_error": "cpp",
+        "sstream": "cpp",
+        "regex": "cpp",
+        "string": "cpp",
         "format": "cpp",
-        "ostream": "cpp"
+        "bitset": "cpp",
+        "*.tcc": "cpp",
+        "istream": "cpp",
+        "vector": "cpp"
     }
 }
